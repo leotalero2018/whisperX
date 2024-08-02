@@ -27,59 +27,20 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "whisperx-helm.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
-#          readinessProbe:
-#            tcpSocket:
-#              port: 9080
-#            initialDelaySeconds: 300
-#            periodSeconds: 30
-#          command: [ "/bin/bash" ]
-#          args: [ "-c", "while true; do sleep 600; done" ]
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-              initialDelaySeconds: 5
-              periodSeconds: 80
-
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            - mountPath: /whisperX
-              name: whisperx-helm-pvc
-          {{- end }}
-      {{- with .Values.volumes }}
+      - name: whisperx
+        image: leodocker2021/whisperx:latest
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: whisperx-helm-pvc
+          mountPath: /whisperX
+        env:
+          - name: PYTHONUNBUFFERED
+            value: "1"
       volumes:
         - name: whisperx-helm-pvc
           persistentVolumeClaim:
             claimName: whisperx-helm-pvc
-      {{- end }}
-      {{- with .Values.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}

@@ -7,4 +7,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100Gi # Adjust according to the size of your models
+      storage: 50Gi # Adjust according to the size of your models
