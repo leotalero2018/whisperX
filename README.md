@@ -214,15 +214,15 @@ Once the deployment is successful and the application is stable, verify WhisperX
 
 In the ArgoCD dashboard, search for the `whisperx` application as shown in the following image:
 
-![Alt text](whisper_images/Screenshot_2024-07-10_at_6.34.14_PM.png "whisperX app in ArgoCD")
+![Alt text](whisper_images/Screenshot 2024-08-02 at 3.09.23 PM.png "whisperX app in ArgoCD")
 
 Verify that the application is correctly synced and has a healthy status. This step is crucial to confirm that the updates have been successfully deployed and that the Riva service is operating without issues. Monitoring the sync status and health in ArgoCD helps maintain the stability and reliability of your WhisperX deployment. An example of the healthy status of the app might look like the following:
 
-![Alt text](whisper_images/Screenshot_2024-07-10_at_6.33.38_PM.png "whisperX app in ArgoCD")
+![Alt text](whisper_images/Screenshot 2024-08-02 at 3.09.38 PM.png "whisperX app in ArgoCD")
 
 ## Use
 
-#### Accessing WhisperX from Outside the Cluster (Jupyter Notebook)
+#### Accessing WhisperX from Jupyter Notebook
 
 WhisperX is utilized in two primary Jupyter Notebooks:
 
@@ -232,29 +232,63 @@ WhisperX is utilized in two primary Jupyter Notebooks:
 
 #### Jupyter Notebook STT
 
+The notebook is designed to demonstrate how users can programmatically interact with the WhisperX service. It simplifies the process of sending audio files and customizing requests with specific parameters like language preference and computation type.
+
+Users can execute the notebook to send HTTP POST requests to the WhisperX service. The request includes an audio file and optional parameters that specify the language and computation type. This setup is ideal for testing and debugging the speech recognition capabilities of WhisperX in a controlled environment.
+
 Here is a basic example of how to use WhisperX in a Jupyter Notebook for sending an audio file to a WhisperX-based FastAPI service for speech recognition:
 
    ```sh
-    import requests
-    
-    # URL of the FastAPI service deployed with WhisperX
-    url = 'http://<fastapi_service_url>/recognize'
-    
-    # Path to your .wav file
-    file_path = 'path_to_your_file.wav'
-    
-    # Open the file in binary mode and prepare the file payload
     with open(file_path, 'rb') as file:
         files = {'file': (file.name, file, 'audio/wav')}
         
-        # Make the POST request to the WhisperX service
-        response = requests.post(url, files=files)
+        # Make the POST request with parameters
+        response = requests.post(url, params=params, files=files)
         
-        # Print the transcription response from the server
+        # Print the response from the server
         print(response.text)
    ```
 
 This code snippet demonstrates a straightforward way to interact with WhisperX through HTTP requests, providing a practical example that can be expanded upon for more complex applications involving speech data.
+
+**Using the notebook**
+
+1. Set Up: The notebook begins by importing necessary Python libraries such as `requests`. This library is crucial for making HTTP requests to the WhisperX service.
+
+2. Specify the Service URL: The URL configured in the notebook points to the WhisperX service deployed within the Kubernetes cluster. This URL is crucial for directing requests to the correct service endpoint.
+
+3. Prepare the Audio File: Users need to specify the path to the audio file they wish to transcribe. This file is opened in binary mode and attached to the POST request.
+
+4. Customization through Parameters: The notebook allows users to specify parameters such as `language` and `compute_type`. These parameters are sent as part of the query string in the POST request, allowing users to tailor the transcription process to their specific needs.
+
+5. Sending the Request: The notebook uses the requests.post method to send the audio file and parameters to the WhisperX service. The response from the service is then printed, showing the transcription results or any error messages.
+
+6. Error Handling: The notebook includes basic error handling that captures and displays errors from the transcription process, aiding in troubleshooting and ensuring that users can identify and resolve issues quickly.
+
+#### Accessing WhisperX from Outside the Cluster (Port Forward)
+
+Port forwarding is a technique used to expose services running on specific ports within a Kubernetes cluster to ports on the user's local machine. This allows the user to send requests to the service using `localhost`, effectively bypassing the need for external exposure of the service.
+
+##### Setting Up Port Forwarding
+
+To set up port forwarding with WhisperX, the following steps can be followed:
+
+- **Identify the Service**: Determine the service within the Kubernetes cluster that you want to access. In this case, it’s the WhisperX service.
+
+- **Open a Terminal**: On your local machine, open a terminal window.
+
+- **Execute the Port Forwarding Command**:
+
+   ```sh
+   kubectl port-forward svc/whisperx-helm 9000:80
+   ```
+- Once port forwarding is set up, you can access WhisperX using your web browser or any HTTP client by navigating to:
+
+   ```sh
+   http://localhost:9000/docs
+   ```
+
+This URL directs to the WhisperX service through the forwarded port, allowing you to interact with it as though it were running on your local machine.
 
 ### Responses
 
@@ -287,8 +321,8 @@ Each format provides a different level of detail and is suitable for various app
 WhisperX includes support for Prometheus metrics, which can be scraped for monitoring. Currently there are a couple of metrics being displayed in
 [Grafana](https://aimp-telemetry.ai-dev.i.telconet.net)
 
-![Alt text](whisper_images/Screenshot_2024-07-11_at_10.48.41_AM.png "riva monitoring")
+![Alt text](whisper_images/Screenshot 2024-08-02 at 3.11.44 PM.png "riva monitoring")
 
-![Alt text](whisper_images/Screenshot_2024-07-15_at_9.23.17_AM.png "riva monitoring")
+![Alt text](whisper_images/Screenshot 2024-08-02 at 3.11.54 PM.png "riva monitoring")
 
 

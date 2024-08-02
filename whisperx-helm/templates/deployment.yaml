@@ -37,6 +37,9 @@ spec:
         volumeMounts:
         - name: whisperx-helm-pvc
           mountPath: /whisperX
+        resources:
+          limits:
+            nvidia.com/gpu: 1
         env:
           - name: PYTHONUNBUFFERED
             value: "1"
@@ -44,3 +47,9 @@ spec:
         - name: whisperx-helm-pvc
           persistentVolumeClaim:
             claimName: whisperx-helm-pvc
+      tolerations:
+        - key: "nvidia.com/gpu"
+          operator: "Exists"
+          effect: "NoSchedule"
+      nodeSelector:
+        kubernetes.io/hostname: dgx005dg
